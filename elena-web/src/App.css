@@ -1,0 +1,420 @@
+/* Page layout */
+.page {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0.5rem 0 2rem;
+  text-align: left;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.25rem 0;
+}
+.header h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+.header a[href="/"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.header a[href="/"]:hover {
+  color: var(--text);
+  background: var(--bg-card-hover);
+}
+
+/* Network status */
+.network-status {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.network-status.live {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--success);
+}
+.network-status.offline {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--danger);
+}
+.network-status:not(.live):not(.offline) {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.card-highlight {
+  border-color: rgba(45, 212, 191, 0.3);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(45, 212, 191, 0.05) 100%);
+}
+.card-safety {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+/* Wallet card */
+.wallet-card {
+  padding: 1.75rem;
+}
+.wallet-card h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.wallet-card .balance {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0.5rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.wallet-card .balance-hint {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+.wallet-card .reputation {
+  color: var(--accent);
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+.wallet-card .meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 0.25rem;
+}
+.wallet-card .meta-secondary {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* Sections */
+.section {
+  margin-top: 1.5rem;
+}
+.section h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem 0;
+}
+.quick-start {
+  margin-top: 1rem;
+}
+.quick-start h3 {
+  margin-bottom: 0.5rem;
+}
+.list-simple {
+  list-style: decimal;
+  padding-left: 1.35rem;
+  margin: 0;
+}
+.list-simple li {
+  margin-bottom: 0.6rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.list-simple li a {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Main navigation */
+.nav {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+.nav-main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+.nav-main .nav-primary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-height: 72px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav-main .nav-primary:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(45, 212, 191, 0.25);
+  color: var(--accent);
+}
+.nav-secondary {
+  margin-top: 0.5rem;
+  gap: 1rem;
+}
+.nav-secondary a {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  padding: 0.35rem 0;
+}
+.nav-secondary a:hover {
+  color: var(--text-muted);
+}
+
+/* Transaction list */
+.tx-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.tx-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.tx-item:last-child {
+  border-bottom: none;
+}
+.tx-amount {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 6.5rem;
+}
+.tx-time {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+.tx-from-to {
+  width: 100%;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  word-break: break-all;
+  margin-top: 0.15rem;
+}
+
+/* Forms */
+.form label {
+  display: block;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.form label:last-of-type {
+  margin-bottom: 1.5rem;
+}
+.form input {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.form button[type="submit"],
+.form button:not(.secondary) {
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.form button[type="submit"]:hover:not(:disabled),
+.form button:not(.secondary):hover {
+  background: var(--accent-hover);
+}
+.form button.secondary {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+}
+.form button.secondary:hover {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+
+/* Card form layout (e.g. Settings two buttons) */
+.card.form .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.card.form .form-actions button {
+  flex: 1;
+}
+
+/* Messages */
+.error {
+  color: var(--danger);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  padding: 0.65rem 1rem;
+  background: rgba(248, 113, 113, 0.1);
+  border-radius: var(--radius-sm);
+}
+.error a {
+  color: var(--accent);
+}
+.success {
+  color: var(--success);
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+  padding: 0.65rem 1rem;
+  background: rgba(52, 211, 153, 0.1);
+  border-radius: var(--radius-sm);
+}
+.muted {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+.card h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text);
+}
+.card h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--text);
+}
+.list {
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+.list li {
+  margin-bottom: 0.5rem;
+}
+.help-intro {
+  margin-bottom: 1rem;
+}
+
+/* CreateNode page */
+.create-intro {
+  margin-bottom: 1.5rem;
+}
+.btn-deploy {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  margin: 0.75rem 0;
+}
+.btn-deploy:hover {
+  background: var(--accent-hover);
+}
+.code-block {
+  position: relative;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.code-block code {
+  font-size: 0.8rem;
+  word-break: break-all;
+  display: block;
+}
+.btn-copy {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.btn-copy:hover {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+.small {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Receive: pubkey block */
+.pubkey {
+  word-break: break-all;
+  font-size: 0.8rem;
+  font-family: ui-monospace, monospace;
+  color: var(--text-muted);
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.card .pubkey + button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+.card .pubkey + button:hover {
+  background: var(--accent-hover);
+}
+
+/* Remove old duplicate .card padding */
+.cards {
+  margin: 0;
+}

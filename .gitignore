@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build / artifacts
+dist/
+dist-ssr/
+*.local
+target/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Env (не коммитить секреты)
+.env
+.env.local
+.env.*.local
+
+# Tauri
+elena-desktop/src-tauri/target/
+
+# React Native
+elena-mobile/android/build/
+elena-mobile/ios/build/
+*.xcworkspace
+
+# Docker
+.docker/
+
+# Elena data (ключи и данные — не коммитить!)
+elena-core/.elena/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+elena-sim/results/
+
+# Submodule
+elena-mobile/

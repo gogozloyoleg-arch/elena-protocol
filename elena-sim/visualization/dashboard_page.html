@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Елена — дашборд</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; margin: 0; background: #1a1b26; color: #c0caf5; }
+    .header { padding: 1rem 1.5rem; background: #16161e; border-bottom: 1px solid #363b54; }
+    .header h1 { margin: 0; font-size: 1.5rem; }
+    .header p { margin: 0.5rem 0 0; opacity: 0.8; font-size: 0.9rem; }
+    .layout { display: flex; flex-wrap: wrap; gap: 1rem; padding: 1rem; min-height: calc(100vh - 80px); }
+    .panel { background: #24283b; border-radius: 8px; padding: 1rem; border: 1px solid #363b54; }
+    .graph-container { flex: 1 1 700px; min-height: 500px; position: relative; }
+    #mynetwork { width: 100%; height: 500px; border-radius: 8px; }
+    .sidebar { flex: 0 1 320px; }
+    .metrics h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    .metrics ul { list-style: none; padding: 0; margin: 0; font-size: 0.85rem; }
+    .metrics li { padding: 0.25rem 0; border-bottom: 1px solid #363b54); }
+    .metrics li:last-child { border-bottom: none; }
+    .btn { background: #7aa2f7; color: #1a1b26; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 0.5rem; margin-top: 0.5rem; }
+    .btn:hover { background: #89b4fa; }
+    .btn.secondary { background: #363b54; color: #c0caf5; }
+    .btn.secondary:hover { background: #414868; }
+    .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; font-size: 0.8rem; }
+    .legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+    .legend .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .anim-status { margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Сеть Елена — дашборд</h1>
+    <p>Граф узлов (цвет = репутация). Анимация: расхождение двух транзакций от злого узла.</p>
+  </div>
+  <div class="layout">
+    <div class="panel graph-container">
+      <div id="mynetwork"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:#f7768e;"></i> Злой узел</span>
+        <span><i class="dot" style="background:#9ece6a;"></i> Высокая репутация</span>
+        <span><i class="dot" style="background:#e0af68;"></i> Средняя</span>
+        <span><i class="dot" style="background:#bb9af7;"></i> Волна tx1</span>
+        <span><i class="dot" style="background:#7dcfff;"></i> Волна tx2</span>
+      </div>
+      <button class="btn" id="btnAnim">Показать распространение tx1 / tx2</button>
+      <button class="btn secondary" id="btnReset">Сбросить цвета</button>
+      <div class="anim-status" id="animStatus"></div>
+    </div>
+    <div class="panel sidebar">
+      <div class="metrics">
+        <h3>Метрики</h3>
+        <ul id="metricsList"></ul>
+      </div>
+      <div class="metrics" style="margin-top: 1rem;">
+        <h3>Граф</h3>
+        <ul id="graphList"></ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    const networkDiv = document.getElementById('mynetwork');
+    const metricsList = document.getElementById('metricsList');
+    const graphList = document.getElementById('graphList');
+    const btnAnim = document.getElementById('btnAnim');
+    const btnReset = document.getElementById('btnReset');
+    const animStatus = document.getElementById('animStatus');
+
+    let network = null;
+    let graphData = { nodes: [], edges: [], transactions_count: 0, alerts_count: 0 };
+    let evilNodeId = null;
+    let bfsLayers = null;
+
+    function repToColor(rep) {
+      if (rep >= 0.8) return '#9ece6a';
+      if (rep >= 0.5) return '#e0af68';
+      if (rep >= 0.2) return '#ff9e64';
+      return '#f7768e';
+    }
+
+    function loadGraph() {
+      return fetch('/graph').then(r => r.json());
+    }
+
+    function loadMetrics() {
+      return fetch('/metrics').then(r => r.json());
+    }
+
+    function buildBFSLayers(edges, fromId) {
+      const adj = {};
+      edges.forEach(e => {
+        if (!adj[e.source]) adj[e.source] = [];
+        if (!adj[e.source].includes(e.target)) adj[e.source].push(e.target);
+        if (!adj[e.target]) adj[e.target] = [];
+        if (!adj[e.target].includes(e.source)) adj[e.target].push(e.source);
+      });
+      const layers = [];
+      const visited = new Set([fromId]);
+      let front = [fromId];
+      while (front.length) {
+        layers.push([...front]);
+        const next = [];
+        front.forEach(id => {
+          (adj[id] || []).forEach(neigh => {
+            if (!visited.has(neigh)) { visited.add(neigh); next.push(neigh); }
+          });
+        });
+        front = next;
+      }
+      return layers;
+    }
+
+    function drawGraph(data) {
+      graphData = data;
+      const nodes = new vis.DataSet(
+        data.nodes.map(n => ({
+          id: n.id,
+          label: n.id.replace('node_', 'n').replace('evil_0', 'EVIL'),
+          color: {
+            background: n.is_evil ? '#f7768e' : repToColor(n.reputation || 0.5),
+            border: n.is_evil ? '#ff6b8a' : '#565f89',
+          },
+          font: { color: '#c0caf5', size: 10 },
+        }))
+      );
+      const edges = new vis.DataSet(data.edges.map(e => ({ from: e.source, to: e.target })));
+
+      const container = networkDiv;
+      const netData = { nodes, edges };
+      const options = {
+        nodes: { shape: 'dot', size: 14 },
+        edges: { width: 0.8, color: { color: '#363b54' } },
+        physics: { enabled: true, barnesHut: { gravitationalConstant: -4000, springLength: 120 } },
+        interaction: { hover: true, zoomView: true, dragView: true },
+      };
+      if (network) network.destroy();
+      network = new vis.Network(container, netData, options);
+
+      evilNodeId = data.nodes.find(n => n.is_evil)?.id || null;
+      bfsLayers = evilNodeId ? buildBFSLayers(data.edges, evilNodeId) : [];
+    }
+
+    function updateNodesColor(nodesUpdate) {
+      if (!network) return;
+      graphData.nodes.forEach(n => {
+        const c = nodesUpdate[n.id];
+        if (c) network.body.data.nodes.update({ id: n.id, color: { background: c, border: c } });
+      });
+    }
+
+    function resetColors() {
+      graphData.nodes.forEach(n => {
+        const bg = n.is_evil ? '#f7768e' : repToColor(n.reputation || 0.5);
+        if (network) network.body.data.nodes.update({ id: n.id, color: { background: bg, border: bg } });
+      });
+      animStatus.textContent = '';
+    }
+
+    async function runPropagationAnimation() {
+      if (!evilNodeId || !bfsLayers.length) {
+        animStatus.textContent = 'Нет злого узла в графе для анимации.';
+        return;
+      }
+      animStatus.textContent = 'Анимация: расхождение двух транзакций от злого узла...';
+      const nodeColors = {};
+      graphData.nodes.forEach(n => { nodeColors[n.id] = n.is_evil ? '#f7768e' : repToColor(n.reputation); });
+
+      for (let layer = 0; layer < bfsLayers.length; layer++) {
+        const isTx1 = layer % 2 === 0;
+        const color = isTx1 ? '#bb9af7' : '#7dcfff';
+        bfsLayers[layer].forEach(id => { nodeColors[id] = color; });
+        updateNodesColor(nodeColors);
+        await new Promise(r => setTimeout(r, 400));
+      }
+      animStatus.textContent = 'Готово. Фиолетовый и голубой — две «волны» от одного узла; где они сходятся, узлы обнаруживают конфликт.';
+    }
+
+    function renderMetrics(m) {
+      if (!m || typeof m !== 'object') { metricsList.innerHTML = '<li>Нет данных</li>'; return; }
+      metricsList.innerHTML = Object.entries(m).map(([k, v]) => `<li><strong>${k}</strong>: ${v}</li>`).join('');
+    }
+
+    function renderGraphInfo() {
+      graphList.innerHTML = `
+        <li><strong>Узлов</strong>: ${graphData.nodes.length}</li>
+        <li><strong>Рёбер</strong>: ${graphData.edges.length}</li>
+        <li><strong>Транзакций</strong>: ${graphData.transactions_count}</li>
+        <li><strong>Алертов</strong>: ${graphData.alerts_count}</li>
+      `;
+    }
+
+    async function init() {
+      try {
+        const [graph, metrics] = await Promise.all([loadGraph(), loadMetrics()]);
+        drawGraph(graph);
+        renderMetrics(metrics);
+        renderGraphInfo();
+      } catch (e) {
+        metricsList.innerHTML = '<li>Ошибка загрузки. Запустите симуляцию с --viz.</li>';
+        console.error(e);
+      }
+    }
+
+    btnAnim.addEventListener('click', runPropagationAnimation);
+    btnReset.addEventListener('click', resetColors);
+    init();
+  </script>
+</body>
+</html>

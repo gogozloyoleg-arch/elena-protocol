@@ -1,0 +1,26 @@
+# Render Blueprint: один узел + gateway
+# Deploy: нажмите "Deploy to Render" на странице Создать узел в кошельке
+
+services:
+  - type: web
+    runtime: docker
+    name: elena-node-gateway
+    dockerfilePath: ./Dockerfile.node-gateway
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 9180
+      - key: GATEWAY_LISTEN
+        value: 0.0.0.0:9180
+      - key: NODE_NAME
+        value: mynode
+      - key: BALANCE
+        value: "1000"
+    disk:
+      name: elena-data
+      mountPath: /data
+      sizeGB: 1
+    healthCheckPath: /api/v1/status

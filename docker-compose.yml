@@ -1,0 +1,67 @@
+name: elena
+
+services:
+  node1:
+    build: ./elena-core
+    environment:
+      NODE_NAME: node1
+      LISTEN_PORT: "9000"
+      ADMIN_PORT: "9190"
+      BALANCE: "1000000"
+      DATA_DIR: /data
+    ports:
+      - "19000:9000"
+      - "19190:9190"
+    volumes:
+      - elena-node1:/data
+
+  node2:
+    build: ./elena-core
+    environment:
+      NODE_NAME: node2
+      LISTEN_PORT: "9001"
+      ADMIN_PORT: "9191"
+      PEERS: /ip4/node1/tcp/9000
+      BALANCE: "500000"
+      DATA_DIR: /data
+    ports:
+      - "19001:9001"
+      - "19191:9191"
+    volumes:
+      - elena-node2:/data
+    depends_on:
+      - node1
+
+  gateway:
+    build: ./elena-gateway
+    environment:
+      ELENA_NODE_ADMIN: node1:9190
+      GATEWAY_LISTEN: "0.0.0.0:9180"
+    ports:
+      - "9180:9180"
+    depends_on:
+      - node1
+
+  web-wallet:
+    build:
+      context: ./elena-web
+      args:
+        VITE_API_URL: http://localhost:9180
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+
+  owner-dashboard:
+    build:
+      context: ./elena-owner-dashboard
+      args:
+        VITE_API_URL: http://localhost:9180
+    ports:
+      - "3001:80"
+    depends_on:
+      - gateway
+
+volumes:
+  elena-node1:
+  elena-node2:

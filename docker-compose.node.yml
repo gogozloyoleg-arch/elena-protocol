@@ -1,0 +1,34 @@
+# Один узел + gateway — для пользователя, который хочет свой кошелёк
+# Запуск: docker compose -f docker-compose.node.yml up -d
+# Gateway: http://localhost:9180 (или ваш_хост:9180)
+
+services:
+  node:
+    build: ./elena-core
+    environment:
+      NODE_NAME: mynode
+      LISTEN_PORT: "9000"
+      ADMIN_PORT: "9190"
+      BALANCE: "1000"
+      DATA_DIR: /data
+    volumes:
+      - elena-node-data:/data
+    healthcheck:
+      test: ["CMD", "elena-core", "-d", "/data", "stats", "--admin", "127.0.0.1:9190"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  gateway:
+    build: ./elena-gateway
+    environment:
+      ELENA_NODE_ADMIN: node:9190
+      GATEWAY_LISTEN: "0.0.0.0:9180"
+    ports:
+      - "9180:9180"
+    depends_on:
+      node:
+        condition: service_healthy
+
+volumes:
+  elena-node-data:

@@ -1,0 +1,67 @@
+# Сеть «Елена»: три узла (Алиса, Боб, Чарли)
+# Запуск: docker compose up -d
+# Статистика: docker compose exec alice elena-core -d /data ... нет, RPC с хоста:
+#   curl не подходит для нашего протокола; с хоста нужен бинарник или скрипт.
+# Для stats/send с хоста подключайтесь к localhost:9190, 9191, 9192.
+
+services:
+  alice:
+    build: .
+    container_name: elena-alice
+    environment:
+      NODE_NAME: alice
+      LISTEN_PORT: "9000"
+      ADMIN_PORT: "9190"
+      BALANCE: "1000"
+    ports:
+      - "9000:9000"   # P2P
+      - "9190:9190"   # Admin RPC
+    volumes:
+      - elena-alice-data:/data
+    healthcheck:
+      test: ["CMD", "elena-core", "-d", "/data", "stats", "--admin", "127.0.0.1:9190"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  bob:
+    build: .
+    container_name: elena-bob
+    environment:
+      NODE_NAME: bob
+      LISTEN_PORT: "9001"
+      ADMIN_PORT: "9191"
+      BALANCE: "1000"
+      PEERS: "/dns4/alice/tcp/9000"
+    ports:
+      - "9001:9001"
+      - "9191:9191"
+    volumes:
+      - elena-bob-data:/data
+    depends_on:
+      alice:
+        condition: service_started
+
+  charlie:
+    build: .
+    container_name: elena-charlie
+    environment:
+      NODE_NAME: charlie
+      LISTEN_PORT: "9002"
+      ADMIN_PORT: "9192"
+      BALANCE: "1000"
+      PEERS: "/dns4/alice/tcp/9000"
+    ports:
+      - "9002:9002"
+      - "9192:9192"
+    volumes:
+      - elena-charlie-data:/data
+    depends_on:
+      alice:
+        condition: service_started
+
+volumes:
+  elena-alice-data:
+  elena-bob-data:
+  elena-charlie-data:

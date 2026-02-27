@@ -1,0 +1,19 @@
+{
+  "productName": "ELENA Wallet",
+  "version": "0.1.0",
+  "identifier": "network.elena.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "resources": ["resources/"]
+  }
+}

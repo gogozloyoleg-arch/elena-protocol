@@ -1,0 +1,32 @@
+[package]
+name = "elena-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Elena Team"]
+description = "Post-quantum decentralized payment network"
+
+[dependencies]
+# Криптография
+pqcrypto-dilithium = "0.5"
+pqcrypto-traits = "0.3"
+sha3 = "0.10"
+rand = "0.8"
+
+# Сеть и асинхронность
+tokio = { version = "1.35", features = ["full"] }
+libp2p = { version = "0.53", features = ["tcp", "noise", "yamux", "floodsub", "mdns", "tokio", "macros", "quic"] }
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+
+# Утилиты
+log = "0.4"
+env_logger = "0.10"
+clap = { version = "4.4", features = ["derive"] }
+thiserror = "1.0"
+anyhow = "1.0"
+hex = "0.4"
+dashmap = "5.5"
+serde_json = "1.0"
+
+[dev-dependencies]
+tempfile = "3.8"

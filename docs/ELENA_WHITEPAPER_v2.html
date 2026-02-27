@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Протокол «Елена» — White Paper v2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #0a0e14;
+      --color-surface: #131920;
+      --color-surface-elevated: #1a212c;
+      --color-border: #2d3748;
+      --color-text: #e8edf5;
+      --color-muted: #7d8a9a;
+      --color-accent: #5b9cf7;
+      --color-accent-2: #a78bfa;
+      --color-success: #34d399;
+      --color-warn: #fbbf24;
+      --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, monospace;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, var(--color-bg) 0%, #0d1218 100%);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .cover {
+      text-align: center;
+      padding: 4rem 2rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .cover h1 {
+      font-size: 2.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #5b9cf7 0%, #a78bfa 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .cover .subtitle {
+      color: var(--color-muted);
+      font-size: 1.1rem;
+    }
+    .cover .version {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--color-muted);
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.75rem 2rem;
+      z-index: 100;
+    }
+    nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    nav a {
+      color: var(--color-accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    nav a:hover { text-decoration: underline; }
+    h2 {
+      font-size: 1.75rem;
+      margin: 3rem 0 1rem;
+      color: var(--color-text);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+    h3 { font-size: 1.25rem; margin: 2rem 0 0.75rem; }
+    h4 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+    p { margin: 0 0 1rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: var(--color-surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow);
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+    th {
+      background: linear-gradient(90deg, rgba(91,156,247,0.15) 0%, rgba(167,139,250,0.08) 100%);
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .highlight { color: var(--color-success); font-weight: 600; }
+    pre, code {
+      font-family: var(--font-mono);
+      background: var(--color-surface);
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      border: 1px solid var(--color-border);
+    }
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .diagram {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .diagram svg { max-width: 100%; }
+    .chart-wrapper {
+      background: linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      box-shadow: var(--shadow);
+    }
+    .chart-wrapper .chart-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+    }
+    .chart-container {
+      position: relative;
+      min-height: 260px;
+      margin: 0;
+      padding: 0;
+    }
+    .chart-container svg { width: 100%; display: block; }
+    .bar-chart { display: flex; flex-direction: column; gap: 1rem; }
+    .bar-row { display: flex; align-items: center; gap: 1rem; }
+    .bar-row label { min-width: 180px; font-size: 0.9rem; color: var(--color-muted); }
+    .bar-track {
+      flex: 1;
+      height: 28px;
+      background: rgba(45, 55, 72, 0.5);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      min-width: 4px;
+      transition: width 0.6s ease;
+    }
+    .bar-value { min-width: 70px; font-weight: 600; font-size: 0.95rem; text-align: right; }
+    .pie-chart { display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; padding: 1rem 0; }
+    .pie-svg { width: 200px; height: 200px; }
+    .pie-legend { display: flex; flex-direction: column; gap: 0.75rem; }
+    .pie-legend-item { display: flex; align-items: center; gap: 0.75rem; }
+    .pie-legend-color { width: 14px; height: 14px; border-radius: 4px; }
+    .radar-grid { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; padding: 1rem 0; }
+    .radar-metric { text-align: center; padding: 0.5rem 1rem; background: var(--color-surface); border-radius: 8px; border: 1px solid var(--color-border); }
+    .radar-metric strong { display: block; font-size: 1.25rem; color: var(--color-success); margin-bottom: 0.25rem; }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .card {
+      background: linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .card h4 { margin-top: 0; font-weight: 600; color: var(--color-text); }
+    .footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    @media print {
+      nav { display: none; }
+      body { background: #fff; color: #111; }
+      .container { max-width: 100%; }
+      .chart-container { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#principles">Принципы</a></li>
+      <li><a href="#architecture">Архитектура</a></li>
+      <li><a href="#network">libp2p</a></li>
+      <li><a href="#reputation">Репутация</a></li>
+      <li><a href="#crypto">Криптография</a></li>
+      <li><a href="#economics">Экономика</a></li>
+      <li><a href="#security">Безопасность</a></li>
+      <li><a href="#roadmap">Дорожная карта</a></li>
+    </ul>
+  </nav>
+
+  <div class="cover">
+    <h1>Протокол «Елена»</h1>
+    <p class="subtitle">Elena Protocol — White Paper</p>
+    <p class="version">v2.0 | Март 2026</p>
+  </div>
+
+  <div class="container">
+    <section id="intro">
+      <h2>1. Аннотация</h2>
+      <p><strong>«Елена»</strong> — децентрализованная платёжная сеть нового поколения на основе атмосферного консенсуса и эхо-локации. Все криптографические примитивы <strong>пост-квантовые</strong> (CRYSTALS-Dilithium, SHA3-512). Экономика построена на репутации: новые монеты «выпадают в осадок» пропорционально вкладу узла.</p>
+
+      <h3>2. Сравнение с существующими системами</h3>
+      <table>
+        <thead><tr><th>Параметр</th><th>Биткоин</th><th>Ethereum</th><th>Елена</th></tr></thead>
+        <tbody>
+          <tr><td>Энергопотребление</td><td>~150 ТВт·ч/год</td><td>~50 ТВт·ч/год</td><td class="highlight">Микроскопическое</td></tr>
+          <tr><td>Скорость</td><td>10–60 мин</td><td>15 мин</td><td class="highlight">Секунды</td></tr>
+          <tr><td>Квантовая уязвимость</td><td>ECDSA</td><td>ECDSA</td><td class="highlight">Dilithium</td></tr>
+          <tr><td>Власть</td><td>Хешрейт</td><td>Богатство</td><td class="highlight">Репутация</td></tr>
+        </tbody>
+      </table>
+
+      <div class="chart-wrapper">
+        <div class="chart-title">Энергопотребление (ТВт·ч/год)</div>
+        <div class="chart-container bar-chart">
+          <div class="bar-row">
+            <label>Биткоин</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg, #f7931a, #f59e0b);"></div></div>
+            <span class="bar-value">150 ТВт·ч</span>
+          </div>
+          <div class="bar-row">
+            <label>Ethereum</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 33.3%; background: linear-gradient(90deg, #627eea, #818cf8);"></div></div>
+            <span class="bar-value">50 ТВт·ч</span>
+          </div>
+          <div class="bar-row">
+            <label>Елена</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.3%; min-width: 4px; background: linear-gradient(90deg, #34d399, #10b981);"></div></div>
+            <span class="bar-value" style="color: var(--color-success);">микро</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2>3. Ключевые принципы</h2>
+      <div class="card-grid">
+        <div class="card"><h4>Нет глобального состояния</h4><p>Только локальные графы</p></div>
+        <div class="card"><h4>Репутация, а не богатство</h4><p>Власть у вносящих вклад</p></div>
+        <div class="card"><h4>Пост-квантовая защита</h4><p>Устойчивость к квантовым компьютерам</p></div>
+        <div class="card"><h4>Экономика участия</h4><p>Награда за хранение и распространение</p></div>
+        <div class="card"><h4>Саморегуляция</h4><p>Параметры через голосование репутацией</p></div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <h2>4. Архитектура сети</h2>
+
+      <h3>4.1 Атмосферный консенсус</h3>
+      <p>Каждый узел хранит локальную проекцию графа транзакций. Полная картина — как статистическое свойство.</p>
+      <div class="diagram">
+        <svg width="100%" height="180" viewBox="0 0 500 180" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="20" y="20" width="100" height="50" rx="4" fill="#161b22" stroke="#58a6ff"/>
+          <text x="70" y="48" text-anchor="middle" fill="#e6edf3" font-size="12">Узел A</text>
+          <rect x="200" y="20" width="100" height="50" rx="4" fill="#161b22" stroke="#58a6ff"/>
+          <text x="250" y="48" text-anchor="middle" fill="#e6edf3" font-size="12">Узел B</text>
+          <rect x="380" y="20" width="100" height="50" rx="4" fill="#161b22" stroke="#58a6ff"/>
+          <text x="430" y="48" text-anchor="middle" fill="#e6edf3" font-size="12">Узел C</text>
+          <line x1="120" y1="45" x2="200" y2="45"/>
+          <line x1="300" y1="45" x2="380" y2="45"/>
+          <rect x="80" y="100" width="340" height="60" rx="4" fill="#0d1117" stroke="#30363d"/>
+          <text x="250" y="125" text-anchor="middle" fill="#8b949e" font-size="11">DAG транзакций: tx1 ← tx2 ← tx3 ← tx4</text>
+          <text x="250" y="145" text-anchor="middle" fill="#8b949e" font-size="11">tx5 ← tx6 → tx7</text>
+          <line x1="70" y1="70" x2="130" y2="100" stroke-dasharray="4"/>
+          <line x1="250" y1="70" x2="250" y2="100" stroke-dasharray="4"/>
+          <line x1="430" y1="70" x2="370" y2="100" stroke-dasharray="4"/>
+        </svg>
+      </div>
+
+      <h3>4.2 Эхо-локация</h3>
+      <p>Обнаружение двойной траты через коллизии якорей. Якорь: <code>anchor = SHA3-512(balance | hash(last_tx1) | hash(last_tx2) | nonce)</code></p>
+
+      <h3>4.3 Распределение комиссий</h3>
+      <div class="chart-wrapper">
+        <div class="chart-title">Распределение комиссий</div>
+        <div class="chart-container pie-chart">
+          <svg class="pie-svg" viewBox="0 0 100 100">
+            <!-- 50% + 30% + 20%, r=35 → circumf.≈220 -->
+            <circle cx="50" cy="50" r="35" fill="none" stroke="#5b9cf7" stroke-width="16" stroke-dasharray="110 110" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="#a78bfa" stroke-width="16" stroke-dasharray="66 154" stroke-dashoffset="-110" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="#f85149" stroke-width="16" stroke-dasharray="44 176" stroke-dashoffset="-176" transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="pie-legend">
+            <div class="pie-legend-item"><span class="pie-legend-color" style="background:#5b9cf7"></span><span>Хранителям 50%</span></div>
+            <div class="pie-legend-item"><span class="pie-legend-color" style="background:#a78bfa"></span><span>Ретрансляторам 30%</span></div>
+            <div class="pie-legend-item"><span class="pie-legend-color" style="background:#f85149"></span><span>Сжигание 20%</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="network">
+      <h2>6. Сетевой уровень (libp2p)</h2>
+      <div class="diagram">
+        <svg width="100%" height="140" viewBox="0 0 400 140" fill="none" stroke="currentColor" stroke-width="1">
+          <rect x="20" y="10" width="360" height="30" rx="4" fill="#161b22" stroke="#58a6ff"/>
+          <text x="200" y="28" text-anchor="middle" fill="#e6edf3" font-size="12">Floodsub (pub/sub): elena-transactions, elena-alerts</text>
+          <rect x="20" y="50" width="360" height="25" rx="4" fill="#161b22" stroke="#a371f7"/>
+          <text x="200" y="67" text-anchor="middle" fill="#e6edf3" font-size="11">Noise (шифрование)</text>
+          <rect x="20" y="85" width="360" height="25" rx="4" fill="#161b22" stroke="#a371f7"/>
+          <text x="200" y="102" text-anchor="middle" fill="#e6edf3" font-size="11">Yamux (мультиплексирование)</text>
+          <rect x="20" y="120" width="360" height="20" rx="4" fill="#161b22" stroke="#3fb950"/>
+          <text x="200" y="134" text-anchor="middle" fill="#e6edf3" font-size="10">TCP / QUIC</text>
+        </svg>
+      </div>
+    </section>
+
+    <section id="reputation">
+      <h2>7. Репутационная система</h2>
+      <p>Формула: R_нов = R_стар + α·fwd − β·decay + γ·alert − δ·offense</p>
+      <table>
+        <thead><tr><th>Действие</th><th>Δ репутации</th></tr></thead>
+        <tbody>
+          <tr><td>Пересылка транзакции</td><td>+0.0005</td></tr>
+          <tr><td>Создание Alert</td><td>+0.01</td></tr>
+          <tr><td>Ежедневное затухание</td><td>−0.0001</td></tr>
+          <tr><td>Двойная трата</td><td>сброс до 0.01</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="crypto">
+      <h2>5. Пост-квантовая криптография</h2>
+      <table>
+        <thead><tr><th>Компонент</th><th>Параметр</th></tr></thead>
+        <tbody>
+          <tr><td>CRYSTALS-Dilithium</td><td>Стандарт NIST, Level 3, подпись ~2.5 КБ</td></tr>
+          <tr><td>SHA3-512</td><td>Устойчивость к Гроверу: 2²⁵⁶ операций</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="economics">
+      <h2>8. Экономическая модель</h2>
+
+      <h3>8.1 Эмиссия «Осаждения»</h3>
+      <p>награда = база_эмиссии × (байты × время) / общее_хранилище × фактор_репутации</p>
+      <ul>
+        <li><strong>база_эмиссии</strong> = 1 ELENA в час за 1 МБ·день</li>
+        <li><strong>фактор_репутации</strong> = 0.5 + 0.5 × r (r ∈ [0.01, 0.99])</li>
+        <li><strong>Макс. предложение</strong>: 21 000 000 ELENA</li>
+      </ul>
+
+      <h3>8.2 Комиссии</h3>
+      <table>
+        <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+        <tbody>
+          <tr><td>FEE_BASE</td><td>0.0001 ELENA</td></tr>
+          <tr><td>FEE_RATE_BP</td><td>0.01% (1 базисный пункт)</td></tr>
+          <tr><td>Normal</td><td>×1</td></tr>
+          <tr><td>Urgent</td><td>×2</td></tr>
+          <tr><td>Critical</td><td>×10</td></tr>
+        </tbody>
+      </table>
+
+      <h3>8.5 Сравнение с Биткоином</h3>
+      <div class="chart-wrapper">
+        <div class="chart-title">Сравнение: Елена vs Биткоин</div>
+        <div class="chart-container radar-grid">
+          <div class="radar-metric"><strong>5/5</strong>Экологичность</div>
+          <div class="radar-metric"><strong>5/5</strong>Скорость</div>
+          <div class="radar-metric"><strong>5/5</strong>Квантозащита</div>
+          <div class="radar-metric"><strong>5/5</strong>Справедливость</div>
+          <div class="radar-metric"><strong>5/5</strong>Масштабирование</div>
+        </div>
+        <p class="muted" style="text-align:center; margin-top:1rem;">Елена — максимум по всем показателям</p>
+      </div>
+    </section>
+
+    <section id="security">
+      <h2>9. Безопасность</h2>
+      <table>
+        <thead><tr><th>Метрика</th><th>Значение</th></tr></thead>
+        <tbody>
+          <tr><td>Обнаружение двойной траты</td><td class="highlight">3 шага (медиана)</td></tr>
+          <tr><td>Успешных атак</td><td class="highlight">0%</td></tr>
+          <tr><td>Ложных срабатываний</td><td>&lt;0.1%</td></tr>
+        </tbody>
+      </table>
+
+      <h3>10. Результаты симуляций</h3>
+      <div class="chart-wrapper">
+        <div class="chart-title">Метрики симуляций</div>
+        <div class="chart-container bar-chart">
+          <div class="bar-row">
+            <label>Время обнаружения</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 3%; min-width: 4px; background: linear-gradient(90deg, #5b9cf7, #3b82f6);"></div></div>
+            <span class="bar-value">3 шага</span>
+          </div>
+          <div class="bar-row">
+            <label>Alert покрытие</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg, #a78bfa, #8b5cf6);"></div></div>
+            <span class="bar-value">100%</span>
+          </div>
+          <div class="bar-row">
+            <label>Пропускная способность</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 100%; background: linear-gradient(90deg, #34d399, #10b981);"></div></div>
+            <span class="bar-value">1000 tx/с</span>
+          </div>
+          <div class="bar-row">
+            <label>Диаметр графа</label>
+            <div class="bar-track"><div class="bar-fill" style="width: 3%; min-width: 4px; background: linear-gradient(90deg, #5b9cf7, #3b82f6);"></div></div>
+            <span class="bar-value">3</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <h2>11. Дорожная карта</h2>
+      <table>
+        <thead><tr><th>Этап</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr><td>Q2 2026: Testnet — криптография, эхо-локация, экономика</td><td class="highlight">✅</td></tr>
+          <tr><td>Q4 2026: Стейкинг, голосование, мосты</td><td>🔄</td></tr>
+          <tr><td>2027: Mainnet, биржи, мобильные приложения</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="appendix">
+      <h2>13. Приложения</h2>
+      <h3>A. Математическое резюме</h3>
+      <pre>Макс. предложение: M = 21 000 000 ELENA
+Эмиссия: Rᵢ = E × (Sᵢ × Tᵢ) / Σ(Sⱼ × Tⱼ) × (0.5 + 0.5 × rᵢ)
+Комиссия: C = 0.0001 + 0.0001 × A × p
+Репутация: r ∈ [0.01, 0.99]
+Стейкинг: r_эфф = r × (1 + 0.5 × s), s ∈ [0, 0.5]</pre>
+      <h3>B. Структура транзакции</h3>
+      <pre>Transaction { id, from, to, amount, fee, nonce, anchor, parents, timestamp, signature }</pre>
+    </section>
+
+    <section>
+      <h2>12. Заключение</h2>
+      <p>«Елена» предлагает новую парадигму: атмосферный консенсус, пост-квантовую защиту, справедливую экономику, мгновенные транзакции и экологичность без майнинга.</p>
+    </section>
+
+    <footer class="footer">
+      <p>© 2026 Протокол Елена | Лицензия: CC BY-SA 4.0</p>
+      <p>hello@elena.network | github.com/elena-protocol</p>
+    </footer>
+  </div>
+
+</body>
+</html>

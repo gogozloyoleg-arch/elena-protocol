@@ -1,0 +1,3 @@
+test_id,chaff,rewiring,chaff_prob,rewiring_interval,rewiring_prob,detection_time,alert_coverage,peak_load,evil_reputation_before,evil_reputation_after,successful_attack,false_positives,network_diameter,avg_path_length
+baseline,on,on,0.05,100,0.1,3.0,100.0,161,0.99,0.01,0,0,3,1.73
+no_chaff,off,on,0,100,0.1,3.0,100.0,165,0.99,0.01,0,0,3,1.66
